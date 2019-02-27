@@ -1,0 +1,74 @@
+= 数据服务
+:toc: manual
+
+== 数据源准备
+
+=== Mysql
+
+[source, text]
+.*1. 部署 Mysql 到 OpenShift*
+----
+$ oc new-app --docker-image=registry.access.redhat.com/rhscl/mysql-57-rhel7:latest --name=mysql-accounts -e MYSQL_USER=test_user -e MYSQL_PASSWORD=test_pass -e MYSQL_DATABASE=ACCOUNTS -e MYSQL_ROOT_PASSWORD=redhat
+----
+
+[source, text]
+.*2. 初始化数据*
+----
+$ oc port-forward mysql-accounts-1-6d7qp  3306:3306
+
+$ mysql -h127.0.0.1 -utest_user -ptest_pass -P3306 ACCOUNTS < etc/sql/mysql/customer-schema.sql
+
+$ mysql -h127.0.0.1 -utest_user -ptest_pass -P3306 ACCOUNTS -e "SELECT * FROM CUSTOMER"
++----------+-----------+-------------+----------------------------+-----------------------+---------------+----------------+---------+---------------+
+| SSN      | FIRSTNAME | LASTNAME    | ST_ADDRESS                 | APT_NUMBER            | CITY          | STATE          | ZIPCODE | PHONE         |
++----------+-----------+-------------+----------------------------+-----------------------+---------------+----------------+---------+---------------+
+| CST01002 | Joseph    | Smith       | 1234 Main Street           | Apartment 56          | New York      | New York       | 10174   | (646)555-1776 |
+| CST01003 | Nicholas  | Ferguson    | 202 Palomino Drive         | NULL                  | Pittsburgh    | Pennsylvania   | 15071   | (412)555-4327 |
+| CST01004 | Jane      | Aire        | 15 State Street            | NULL                  | Philadelphia  | Pennsylvania   | 19154   | (814)555-6789 |
+| CST01005 | Charles   | Jones       | 1819 Maple Street          | Apartment 17F         | Stratford     | Connecticut    | 06614   | (203)555-3947 |
+| CST01006 | Virginia  | Jefferson   | 1710 South 51st Street     | Apartment 3245        | New York      | New York       | 10175   | (718)555-2693 |
+| CST01007 | Ralph     | Bacon       | 57 Barn Swallow Avenue     | NULL                  | Charlotte     | North Carolina | 28205   | (704)555-4576 |
+| CST01008 | Bonnie    | Dragon      | 88 Cinderella Lane         | NULL                  | Jacksonville  | Florida        | 32225   | (904)555-6514 |
+| CST01009 | Herbert   | Smith       | 12225 Waterfall Way        | Building 100, Suite 9 | Portland      | Oregon         | 97220   | (971)555-7803 |
+| CST01015 | Jack      | Corby       | 1 Lone Star Way            | NULL                  | Dallas        | Texas          | 75231   | (469)555-8023 |
+| CST01019 | Robin     | Evers       | 1814 Falcon Avenue         | NULL                  | Atlanta       | Georgia        | 30355   | (470)555-4390 |
+| CST01020 | Lloyd     | Abercrombie | 1954 Hughes Parkway        | NULL                  | Los Angeles   | California     | 90099   | (213)555-2312 |
+| CST01021 | Scott     | Watters     | 24 Mariner Way             | NULL                  | Seattle       | Washington     | 98124   | (206)555-6790 |
+| CST01022 | Sandra    | King        | 96 Lakefront Parkway       | NULL                  | Minneapolis   | Minnesota      | 55426   | (651)555-9017 |
+| CST01027 | Maryanne  | Peters      | 35 Grand View Circle       | Apartment 5F          | Cincinnati    | Ohio           | 45232   | (513)555-9067 |
+| CST01034 | Corey     | Snyder      | 1760 Boston Commons Avenue | Suite 543             | Boston        | Massachusetts  | 02136   | (617)555-3546 |
+| CST01035 | Henry     | Thomas      | 345 Hilltop Parkway        | NULL                  | San Francisco | California     | 94129   | (415)555-2093 |
+| CST01036 | James     | Drew        | 876 Lakefront Lane         | NULL                  | Cleveland     | Ohio           | 44107   | (216)555-6523 |
++----------+-----------+-------------+----------------------------+-----------------------+---------------+----------------+---------+---------------+
+----
+
+[source, text]
+.**
+----
+
+----
+
+[source, text]
+.**
+----
+
+----
+
+[source, text]
+.**
+----
+
+----
+
+[source, text]
+.**
+----
+
+----
+
+[source, text]
+.**
+----
+
+----
+

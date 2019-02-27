@@ -1,0 +1,8 @@
+swarm:
+  datasources:
+    data-sources:
+      accountsDS:
+        driver-name: mysql
+        connection-url: jdbc:mysql://127.0.0.1:3306/ACCOUNTS
+        user-name: test_user
+        password: test_pass

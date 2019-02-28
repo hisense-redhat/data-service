@@ -23,10 +23,41 @@ spec:
               value: mysql-accounts
             - name: ACCOUNTS_DATABASE_PORT
               value: 3306
+            - name: CUSTOMERS_DB_USERNAME
+              value: test_user
+            - name: CUSTOMERS_DB_PASSWORD
+              value: test_pass
+            - name: CUSTOMERS_DATABASE_NAME
+              value: CUSTOMERS
+            - name: CUSTOMERS_DATABASE_HOST
+              value: postgresql-customers
+            - name: CUSTOMERS_DATABASE_PORT
+              value: 5432
+            - name: MONGODB_DATABASE_HOST
+              value: mongodb-employees
+            - name: MONGODB_DATABASE_PORT
+              value: 27017
+            - name: MONGODB_DB_USERNAME
+              value: test_user
+            - name: MONGODB_DB_PASSWORD
+              value: test_pass
+            - name: MONGODB_DATABASE_NAME
+              value: EMPLOYEES
             - name: JAVA_OPTIONS
               value: "-Dswarm.datasources.data-sources.ACCOUNTS_DS.connection-url=jdbc:mysql://$(ACCOUNTS_DATABASE_HOST):$(ACCOUNTS_DATABASE_PORT)/$(ACCOUNTS_DATABASE_NAME) 
                       -Dswarm.datasources.data-sources.ACCOUNTS_DS.user-name=$(ACCOUNTS_DB_USERNAME) 
                       -Dswarm.datasources.data-sources.ACCOUNTS_DS.password=$(ACCOUNTS_DB_PASSWORD) 
                       -Dswarm.datasources.data-sources.ACCOUNTS_DS.driver-name=mysql
+                      -Dswarm.datasources.data-sources.CUSTOMERS_DS.connection-url=jdbc:postgresql://$(CUSTOMERS_DATABASE_HOST):$(CUSTOMERS_DATABASE_PORT)/$(CUSTOMERS_DATABASE_NAME) 
+                      -Dswarm.datasources.data-sources.CUSTOMERS_DS.user-name=$(CUSTOMERS_DB_USERNAME) 
+                      -Dswarm.datasources.data-sources.CUSTOMERS_DS.password=$(CUSTOMERS_DB_PASSWORD) 
+                      -Dswarm.datasources.data-sources.CUSTOMERS_DS.driver-name=postgresql
+                      -Dswarm.resource-adapters.resource-adapters.mongodbDS.connection-definitions.mongodbDS.class-name=org.teiid.resource.adapter.mongodb.MongoDBManagedConnectionFactory
+                      -Dswarm.resource-adapters.resource-adapters.mongodbDS.connection-definitions.mongodbDS.jndi-name=java:/mongoDS
+                      -Dswarm.resource-adapters.resource-adapters.mongodbDS.connection-definitions.mongodbDS.config-properties.remoteServerList.value=mongodb://$(MONGODB_DATABASE_HOST):$(MONGODB_DATABASE_PORT)
+                      -Dswarm.resource-adapters.resource-adapters.mongodbDS.connection-definitions.mongodbDS.config-properties.database.value=$(MONGODB_DATABASE_NAME)
+                      -Dswarm.resource-adapters.resource-adapters.mongodbDS.connection-definitions.mongodbDS.config-properties.username.value=$(MONGODB_DB_USERNAME)
+                      -Dswarm.resource-adapters.resource-adapters.mongodbDS.connection-definitions.mongodbDS.config-properties.password.value=$(MONGODB_DB_PASSWORD)
+                      -Dswarm.resource-adapters.resource-adapters.mongodbDS.module=org.jboss.teiid.resource-adapter.mongodb
                       -DAB_JOLOKIA_OFF=true"
                                          

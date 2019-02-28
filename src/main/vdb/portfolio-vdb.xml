@@ -7,5 +7,21 @@
         <property name="importer.useFullSchemaName" value="false"/>
         <source name="mysql-connector" translator-name="mysql5" connection-jndi-name="java:jboss/datasources/ACCOUNTS_DS"/>
     </model>
+    
+    <model name="Customers">
+        <property name="importer.useFullSchemaName" value="false"/>
+        <source name="postgresql-connector" translator-name="postgresql" connection-jndi-name="java:jboss/datasources/CUSTOMERS_DS"/>
+    </model>
+    
+    <model name="Employees">
+        <source name="mongodb-connector" translator-name="mongodb" connection-jndi-name="java:/mongoDS"/>
+            <metadata type="DDL"><![CDATA[
+                CREATE FOREIGN TABLE Student (
+                    employee_id integer,
+                    FirstName varchar(25),
+                    LastName varchar(25)
+                ) OPTIONS(UPDATABLE 'TRUE');
+            ]]> </metadata>
+    </model>
 
 </vdb>

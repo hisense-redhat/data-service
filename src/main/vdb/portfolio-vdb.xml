@@ -5,7 +5,7 @@
     
     <model name="Accounts">
         <property name="importer.useFullSchemaName" value="false"/>
-        <source name="mysql-connector" translator-name="mysql5" connection-jndi-name="java:jboss/datasources/ExampleDS"/>
+        <source name="mysql-connector" translator-name="mysql5" connection-jndi-name="java:jboss/datasources/ACCOUNTS_DS"/>
     </model>
 
 </vdb>

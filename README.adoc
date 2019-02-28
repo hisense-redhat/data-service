@@ -5,16 +5,27 @@
 
 === Mysql
 
+*1. 下载模版*
+
+https://github.com/openshift/origin/blob/release-3.11/examples/db-templates/mysql-persistent-template.json
+
 [source, text]
-.*1. 部署 Mysql 到 OpenShift*
+.*2. 通过模版部署*
 ----
-$ oc new-app --docker-image=registry.access.redhat.com/rhscl/mysql-57-rhel7:latest --name=mysql-accounts -e MYSQL_USER=test_user -e MYSQL_PASSWORD=test_pass -e MYSQL_DATABASE=ACCOUNTS -e MYSQL_ROOT_PASSWORD=redhat
+$ oc create -f etc/json/mysql-persistent-template.json 
+template "mysql-persistent" created
+
+$ oc new-app mysql-persistent --param MYSQL_DATABASE=ACCOUNTS --param MYSQL_USER=test_user --param MYSQL_PASSWORD=test_pass --param MYSQL_ROOT_PASSWORD=redhat --param DATABASE_SERVICE_NAME=mysql-accounts
 ----
 
 [source, text]
-.*2. 初始化数据*
+.*3. 初始化数据*
 ----
-$ oc port-forward mysql-accounts-1-6d7qp  3306:3306
+$ oc get pods
+NAME                     READY     STATUS    RESTARTS   AGE
+mysql-accounts-1-lvfpn   1/1       Running   0          <invalid>
+
+$ oc port-forward mysql-accounts-1-lvfpn 3306:3306
 
 $ mysql -h127.0.0.1 -utest_user -ptest_pass -P3306 ACCOUNTS < etc/sql/mysql/customer-schema.sql
 
@@ -42,6 +53,75 @@ $ mysql -h127.0.0.1 -utest_user -ptest_pass -P3306 ACCOUNTS -e "SELECT * FROM CU
 +----------+-----------+-------------+----------------------------+-----------------------+---------------+----------------+---------+---------------+
 ----
 
+=== PostgreSQL
+
+*1. 下载模版*
+
+https://github.com/openshift/origin/blob/release-3.11/examples/db-templates/postgresql-persistent-template.json
+
+[source, text]
+.*2. 通过模版部署*
+----
+$ oc create -f etc/json/postgresql-persistent-template.json 
+template "postgresql-persistent" created
+
+$ oc new-app postgresql-persistent --param POSTGRESQL_DATABASE=CUSTOMERS --param POSTGRESQL_USER=test_user --param POSTGRESQL_PASSWORD=test_pass --param DATABASE_SERVICE_NAME=postgresql-customers
+----
+
+[source, text]
+.*3. 初始化数据*
+----
+$ oc get pods | grep postgresql
+postgresql-customers-1-n9csn   1/1       Running     0          <invalid>
+
+$ oc rsh postgresql-customers-1-n9csn
+
+sh-4.2$ PGPASSWORD=$POSTGRESQL_PASSWORD psql -h postgresql-customers $POSTGRESQL_DATABASE $POSTGRESQL_USER
+psql (9.6.10)
+Type "help" for help.
+
+DROP TABLE IF EXISTS ADDRESS;
+DROP TABLE IF EXISTS CUSTOMER;
+
+CREATE TABLE CUSTOMER
+(
+   ID bigint,
+   SSN char(25),
+   NAME varchar(64),
+   CONSTRAINT CUSTOMER_PK PRIMARY KEY(ID)
+);
+
+CREATE TABLE ADDRESS
+(
+   ID bigint,
+   STREET char(25),
+   ZIP char(10),
+   CUSTOMER_ID bigint,
+   CONSTRAINT ADDRESS_PK PRIMARY KEY(ID),
+   CONSTRAINT CUSTOMER_FK FOREIGN KEY (CUSTOMER_ID) REFERENCES CUSTOMER (ID)
+);
+
+INSERT INTO CUSTOMER (ID,SSN,NAME) VALUES (10, 'CST01002','Joseph Smith');
+INSERT INTO CUSTOMER (ID,SSN,NAME) VALUES (11, 'CST01003','Nicholas Ferguson');
+INSERT INTO CUSTOMER (ID,SSN,NAME) VALUES (12, 'CST01004','Jane Aire');
+
+INSERT INTO ADDRESS (ID, STREET, ZIP, CUSTOMER_ID) VALUES (10, 'Main St', '12345', 10);
+
+CUSTOMERS=> SELECT * FROM CUSTOMER;
+ id |            ssn            |       name        
+----+---------------------------+-------------------
+ 10 | CST01002                  | Joseph Smith
+ 11 | CST01003                  | Nicholas Ferguson
+ 12 | CST01004                  | Jane Aire
+(3 rows)
+
+CUSTOMERS=> \q
+sh-4.2$ exit
+exit
+----
+
+=== MongoDB
+
 [source, text]
 .**
 ----
@@ -54,21 +134,41 @@ $ mysql -h127.0.0.1 -utest_user -ptest_pass -P3306 ACCOUNTS -e "SELECT * FROM CU
 
 ----
 
-[source, text]
-.**
-----
 
-----
+== 本地测试
 
 [source, text]
-.**
+.*1. 编译*
 ----
-
+$ mvn clean install
 ----
 
 [source, text]
-.**
+.*2. 启动*
+----
+$ java -Dswarm.datasources.data-sources.AccountsDS.connection-url=jdbc:mysql://127.0.0.1:3306/ACCOUNTS \
+       -Dswarm.datasources.data-sources.AccountsDS.user-name=test_user \
+       -Dswarm.datasources.data-sources.AccountsDS.password=test_pass \
+       -Dswarm.datasources.data-sources.AccountsDS.driver-name=mysql \
+       -jar target/data-service-1.0.0-thorntail.jar
 ----
 
+*3. 使用如下 URL 进行本地测试*
+
+* http://localhost:8080/odata4/Portfolio.1/Accounts/$metadata
+* http://localhost:8080/odata4/Portfolio.1/Accounts/CUSTOMER
+
+== 部署到 OpenShift
+
+[source, text]
+.*1. 部署*
 ----
+$ mvn package fabric8:deploy -Popenshift
+----
+
+*2. 使用如下 URL 进行本地测试*
+
+* http://data-service-odata.apps.example.com/odata4/Portfolio.1/Accounts/$metadata
+* http://data-service-odata.apps.example.com/odata4/Portfolio.1/Accounts/CUSTOMER?$format=JSON
+
 

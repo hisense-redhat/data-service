@@ -7,10 +7,14 @@
   <version>1.0.0</version>
   <packaging>vdb</packaging>
   <properties>
-    <version.wildfly.swarm>2018.2.0</version.wildfly.swarm>
+    
     
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <mysql.version>5.1.38</mysql.version>
+    
+    <version.postgresql>42.1.4</version.postgresql>
+    <mysql.version>5.1.47</mysql.version>
+    
+    <fabric8-maven-plugin.version>3.5.40</fabric8-maven-plugin.version>
     
     <version.thorntail>2.2.0.Final</version.thorntail>
     <version.thorntail.teiid>1.0.3</version.thorntail.teiid>
@@ -32,11 +36,7 @@
   </dependencyManagement>
   
   <dependencies>
-	<dependency>
-	    <groupId>mysql</groupId>
-	    <artifactId>mysql-connector-java</artifactId>
-	    <version>${mysql.version}</version>
-	</dependency>
+	
     <dependency>
       <groupId>org.teiid</groupId>
       <artifactId>thorntail-runtime</artifactId>
@@ -45,6 +45,22 @@
       <groupId>org.teiid</groupId>
       <artifactId>thorntail-jdbc</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.teiid</groupId>
+      <artifactId>thorntail-odata-api</artifactId>
+    </dependency>
+    <dependency>
+	    <groupId>mysql</groupId>
+	    <artifactId>mysql-connector-java</artifactId>
+	    <version>${mysql.version}</version>
+	</dependency>
+	<!--  
+	<dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${version.postgresql}</version>
+    </dependency>
+    -->
   </dependencies>
   
   <build>
@@ -70,7 +86,7 @@
 				<configuration>
 					<arguments>
 						<argument>-S</argument>
-						<argument>local</argument>
+						<argument>openshift</argument>
 					</arguments>
 				</configuration>
       </plugin>
@@ -102,4 +118,29 @@
       </plugin>
     </plugins>
   </build>
+  
+   <profiles>
+                <profile>
+                        <id>openshift</id>
+                        <build>
+                                <plugins>
+                                        <plugin>
+                                                <groupId>io.fabric8</groupId>
+                                                <artifactId>fabric8-maven-plugin</artifactId>
+                                                <version>${fabric8-maven-plugin.version}</version>
+                                                <executions>
+                                                        <execution>
+                                                                <id>fmp</id>
+                                                                <goals>
+                                                                        <goal>resource</goal>
+                                                                        <goal>build</goal>
+                                                                </goals>
+                                                        </execution>
+                                                </executions>
+                                        </plugin>
+                                </plugins>
+                        </build>
+                </profile>
+        </profiles>
+  
 </project>
